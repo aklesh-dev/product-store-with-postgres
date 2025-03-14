@@ -19,7 +19,7 @@ app.use(helmet());
 app.use(morgan("dev"));
 
 // ?Routes
-app.use('/api/products', productRoutes);
+app.use('/api/product', productRoutes);
 
 // ?Database initialize
 async function initDB() {
