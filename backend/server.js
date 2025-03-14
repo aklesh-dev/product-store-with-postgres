@@ -42,7 +42,7 @@ async function initDB() {
   }
 };
 
-// ?
+// *Initialize the database and start the server if successful
 initDB().then(() => {
   app.listen(PORT, () => {
     console.log(`Server is running on port: ${PORT}`);
