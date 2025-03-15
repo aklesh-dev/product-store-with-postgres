@@ -6,6 +6,7 @@ import cors from "cors";
 
 import productRoutes from "./routes/product.route.js"
 import { sql } from "./database/db.config.js";
+import { aj } from "./lib/arcjet.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -17,6 +18,41 @@ app.use(cors());
 app.use(helmet());
 // *log the request
 app.use(morgan("dev"));
+
+// ?Apply arcjet rate limiter to all routes
+app.use( async (req, res, next) => {
+  try {
+    const decision = await aj.protect(req, {
+      requested: 1,  // specifices that each request consume 1 token
+    });
+
+    if (decision.isDenied()) {
+      if(decision.reason.isRateLimit()){
+        res.status(429).json({ message: "Too many requests, please try again later" });
+      }
+      else if(decision.reason.isBot()){
+        res.status(403).json({ message: "Forbidden, bot detected" });
+      }
+      else{
+        res.status(403).json({ message: "Forbidden"})
+      }
+      return;
+    }
+
+    // Check for spoofed bots
+    if(decision.results.some((result) => result.reason.isBot() && result.reason.isSpoofed())) {
+      return res.status(403).json({ message: "Forbidden, spoofed bot detected" });
+    }
+    
+    next();
+    
+  } catch (error) {
+    console.error("Error in arcjet middleware:", error.message);
+    res.status(500).json({ message: "Internal server error" });
+    next(error.message);
+  }
+})
+
 
 // ?Routes
 app.use('/api/product', productRoutes);
