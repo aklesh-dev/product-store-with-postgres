@@ -26,7 +26,7 @@ export default {
       "autumn",
       "valentine",
       "aqua",
-      "bussiness",
+      "business",
       "night",
       "dracula"
       
