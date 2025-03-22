@@ -3,6 +3,7 @@ import "dotenv/config"
 import helmet from "helmet";
 import morgan from "morgan";
 import cors from "cors";
+import path from "path";
 
 import productRoutes from "./routes/product.route.js"
 import { sql } from "./database/db.config.js";
@@ -10,12 +11,15 @@ import { aj } from "./lib/arcjet.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const __dirname = path.resolve(); //* to resolve the path of the current directory which is (root directory of the project)
 
 // ?Middlewares
 app.use(express.json());
 app.use(cors());
 //* helmet is a security middleware that helps you protect your app by setting various HTTP headers
-app.use(helmet());
+app.use(helmet({
+  contentSecurityPolicy:false, //* disable content security policy to allow images to be loaded from other domains
+}));
 // *log the request
 app.use(morgan("dev"));
 
@@ -56,6 +60,17 @@ app.use( async (req, res, next) => {
 
 // ?Routes
 app.use('/api/products', productRoutes);
+
+// *Serve react app
+if(process.env.NODE_ENV === "production"){
+  // *Serving static files in production
+  app.use(express.static(path.join(__dirname, "/frontend/dist")));
+
+  // *Handling all routes that doesn't match the ones above
+  app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
+  });
+}
 
 // ?Database initialize
 async function initDB() {
