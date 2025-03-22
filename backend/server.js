@@ -64,7 +64,7 @@ app.use('/api/products', productRoutes);
 // *Serve react app
 if(process.env.NODE_ENV === "production"){
   // *Serving static files in production
-  app.use(express.static(path.join(__dirname, "/frontend/dist")));
+  app.use(express.static(path.join(__dirname, "frontend", "dist")));
 
   // *Handling all routes that doesn't match the ones above
   app.get("*", (req, res) => {
