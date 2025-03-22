@@ -1,4 +1,4 @@
-[Product-Store](img/product-store-app-homepage.png)
+![Product-Store](img/product-store-app-homepage.png)
 
 ## Arcjet:
 - Arcjet is used for the rate limiting and bot detection of the website.
