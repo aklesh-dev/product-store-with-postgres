@@ -11,6 +11,37 @@ export const useProductStore = create((set, get) => ({
   loading: false,
   error: null,
 
+  // Form Data initial state
+  formData: {
+    name: "",
+    price: "",
+    image: ""
+  },
+
+  setFormData: (formData) => set({formData}),
+  resetForm: () => set({ formData: {name: "", price: "", image: ""}}),
+
+  // Add product functionality
+  addProduct: async (e) => {
+    e.preventDefault();
+    set({loading: true});
+
+    try {
+      const {formData} = get();
+      await axios.post(`${BASE_URL}/api/products/create`, formData);
+      await get().fetchProducts();
+      get().resetForm();
+      toast.success("Product added successfully");
+      document.getElementById("add_product_modal").close();
+    } catch (error) {
+      console.error("Error adding product:", error.message);
+      toast.error("Something went wrong !!!");
+    }finally{
+      set({loading: false, error: null});
+    }
+  },
+  
+
   fetchProducts: async () => {
     set({ loading: true });
     try {
@@ -18,10 +49,10 @@ export const useProductStore = create((set, get) => ({
       set({ products: res.data.data, error: null });
     } catch (err) {
       if (err.status === 429) set({ error: "Rate limit exceeded", products: [] });
-      // else set({ error: "something went wrong", products: [] });
+      else set({ error: "something went wrong", products: [] });
       
     } finally {
-      set({ loading: false });
+      set({ loading: false, error: null });
     }
   },
 
