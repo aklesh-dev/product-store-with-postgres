@@ -55,7 +55,7 @@ app.use( async (req, res, next) => {
 
 
 // ?Routes
-app.use('/api/product', productRoutes);
+app.use('/api/products', productRoutes);
 
 // ?Database initialize
 async function initDB() {
